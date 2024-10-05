@@ -28,7 +28,6 @@ class VentaIdeal:
         
     def options_chrome(self):
         """Configuración del driver para elegir la carpeta de descargas"""
-        
         folder_download = Path(os.getcwd(), "Download")
         if not os.path.exists(folder_download):
             os.makedirs(folder_download)
@@ -42,7 +41,6 @@ class VentaIdeal:
 
     def login_mc1(self):
         url = "https://prodweb-bimbo-las.mc1.com.br/WTM_Client/Form/Run/Custom_Check_Orders_BIMBO?menuItem=1642615056076"
-        
         self.driver.get(url)
         self.driver.find_element(By.ID, "UserName").send_keys(self.credenciales["user"])
         self.driver.find_element(By.ID, "Password").send_keys(self.credenciales["password"])
@@ -59,8 +57,13 @@ class VentaIdeal:
         WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="Modal_dt_CheckOrdersPOMExportExcel_wrapper"]/div[4]/div[4]/button'))).click()
         time.sleep(2)
 
-    def extractor_data(self):
 
+    def eliminar_archivos(self):
+        for archivo in os.listdir("Download"):
+            ruta_archivo = os.path.join("Download", archivo)
+            os.remove(ruta_archivo)
+
+    def extractor_data(self):
         self.login_mc1()
         self.extractor_venta()
         ruta_archivo = max([os.path.join("Download", f) for f in os.listdir("Download")], key=os.path.getctime)
@@ -68,7 +71,8 @@ class VentaIdeal:
         return pd.read_csv(ruta_archivo, sep=";")
 
 if __name__=="__main__":
-
-    df = VentaIdeal().extractor_data()
+    Site_sales = VentaIdeal()
+    Site_sales.eliminar_archivos()
+    df = Site_sales.extractor_data()
 
     print(df)
