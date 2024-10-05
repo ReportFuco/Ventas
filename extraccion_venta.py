@@ -16,8 +16,8 @@ class VentaIdeal:
 
     def __init__(self) -> None:
         self.options = Options()
-        self.options.add_argument("--headless")
-        self.options.add_argument("--window-size=1920x1080")
+        # self.options.add_argument("--headless")
+        # self.options.add_argument("--window-size=200x200")
         self.options.add_experimental_option("prefs", self.options_chrome())
         self.driver = Chrome(options=self.options)
         self.credenciales = self._cargar_credenciales()
@@ -59,13 +59,16 @@ class VentaIdeal:
         WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="Modal_dt_CheckOrdersPOMExportExcel_wrapper"]/div[4]/div[4]/button'))).click()
         time.sleep(2)
 
-    def analisis_venta(self):
+    def extractor_data(self):
 
-        pass
+        self.login_mc1()
+        self.extractor_venta()
+        ruta_archivo = max([os.path.join("Download", f) for f in os.listdir("Download")], key=os.path.getctime)
 
+        return pd.read_csv(ruta_archivo, sep=";")
 
 if __name__=="__main__":
 
-    driver = VentaIdeal()
-    driver.login_mc1()
-    driver.extractor_venta()
+    df = VentaIdeal().extractor_data()
+
+    print(df)
